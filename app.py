@@ -118,6 +118,10 @@ def get_data():
         print(f"❌ Backend Error: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/')
+def index():
+    return render_template_string(HTML_TEMPLATE)
+
 # ---------------------------------------------------------
 # FRONTEND HTML / CSS / JAVASCRIPT TEMPLATE
 # ---------------------------------------------------------
@@ -630,52 +634,120 @@ HTML_TEMPLATE = """
         }
 
         function renderScatterPlot() {
-            const addKm = parseFloat(document.getElementById('bikeSlider').value) || 0;
-            const currentStation = document.getElementById('stationSelect').value;
-
             if (!globalData || !globalData.stations) return;
 
-            const xVals = globalData.stations.map(s => (s.bike_lane_km_1000m || 0) + addKm);
-            const yVals = globalData.stations.map(s => s.dist_to_ztl_m || 0);
-            const textVals = globalData.stations.map(s => s.station_name);
-            const colorVals = globalData.stations.map(s => getMaaSScoreColor(s.maas_readiness_score));
+            const selectedVal = document.getElementById('stationSelect').value;
+            const addKm = parseFloat(document.getElementById('bikeSlider').value) || 0;
 
-            const trace = {
-                x: xVals,
-                y: yVals,
-                text: textVals,
+            const cluster1 = [];
+            const cluster2 = [];
+            const cluster3 = [];
+
+            globalData.stations.forEach(st => {
+                const origBike = st.bike_lane_km_1000m || 0;
+                const simBike = origBike + addKm;
+                const distZtl = Math.round(st.dist_to_ztl_m || 0);
+
+                const item = {
+                    x: simBike,
+                    y: distZtl,
+                    name: st.station_name,
+                    cluster: st.geoai_cluster_name || "Cluster 2: Moderate",
+                    isSelected: (selectedVal !== "ALL" && st.station_name === selectedVal)
+                };
+
+                const clusterStr = String(item.cluster).toLowerCase();
+
+                if (clusterStr.includes("1") || clusterStr.includes("high")) {
+                    cluster1.push(item);
+                } else if (clusterStr.includes("3") || clusterStr.includes("isolated")) {
+                    cluster3.push(item);
+                } else {
+                    cluster2.push(item);
+                }
+            });
+
+            const createClusterTrace = (dataArray, traceName, color) => ({
+                x: dataArray.map(d => d.x),
+                y: dataArray.map(d => d.y),
+                text: dataArray.map(d => d.name),
                 mode: 'markers',
-                type: 'scatter',
+                name: traceName,
                 marker: {
-                    size: globalData.stations.map(s => s.station_name === currentStation ? 16 : 10),
-                    color: colorVals,
-                    line: { color: '#ffffff', width: globalData.stations.map(s => s.station_name === currentStation ? 2.5 : 0.8) }
+                    size: dataArray.map(d => d.isSelected ? 14 : 9),
+                    color: color,
+                    symbol: 'circle',
+                    opacity: dataArray.map(d => (selectedVal === "ALL" || d.isSelected) ? 1.0 : 0.35),
+                    line: {
+                        color: dataArray.map(d => d.isSelected ? '#ffffff' : 'transparent'),
+                        width: dataArray.map(d => d.isSelected ? 2.5 : 0)
+                    }
                 },
-                hovertemplate: '<b>%{text}</b><br>Simulated Bike Lane: <b>%{x:.2f} km</b><br>Dist to ZTL: <b>%{y:.0f} m</b><extra></extra>'
+                hovertemplate: '<b>%{text}</b><br>Simulated Bike Lane: %{x:.1f} km<br>Distance to ZTL: %{y} m<extra></extra>'
+            });
+
+            const traceC1 = createClusterTrace(cluster1, 'Cluster 1: High-Density', '#10b981');
+            const traceC2 = createClusterTrace(cluster2, 'Cluster 2: Moderate', '#c084fc');
+            const traceC3 = createClusterTrace(cluster3, 'Cluster 3: Isolated', '#f43f5e');
+
+            const thresholdLine = {
+                type: 'line',
+                x0: 0,
+                x1: 35,
+                y0: 500,
+                y1: 500,
+                line: {
+                    color: '#06b6d4',
+                    width: 2,
+                    dash: 'dash'
+                }
             };
+
+            const data = [traceC1, traceC2, traceC3];
 
             const layout = {
-                paper_bgcolor: 'rgba(0,0,0,0)',
-                plot_bgcolor: 'rgba(0,0,0,0)',
-                margin: { l: 40, r: 20, t: 10, b: 35 },
-                xaxis: { title: { text: 'Bike Lanes + Added (km)', font: { color: '#64748b', size: 10 } }, tickfont: { color: '#94a3b8', size: 9 }, gridcolor: '#1e293b' },
-                yaxis: { title: { text: 'Distance to ZTL (m)', font: { color: '#64748b', size: 10 } }, tickfont: { color: '#94a3b8', size: 9 }, gridcolor: '#1e293b' },
-                showlegend: false
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                margin: { l: 45, r: 15, t: 10, b: 45 },
+                showlegend: true,
+                legend: {
+                    x: 0.15, 
+                    y: 1.05,
+                    orientation: 'v',
+                    font: { color: '#e2e8f0', size: 10, family: 'Inter, sans-serif' },
+                    bgcolor: 'transparent'
+                },
+                shapes: [thresholdLine],
+                xaxis: {
+                    title: { text: 'Simulated Bike Lane (km)', font: { color: '#94a3b8', size: 10 } },
+                    tickfont: { color: '#64748b', size: 9 },
+                    gridcolor: '#1e2d42',
+                    zerolinecolor: '#1e2d42',
+                    range: [0, 35]
+                },
+                yaxis: {
+                    title: { text: 'Distance to ZTL (m)', font: { color: '#94a3b8', size: 10 } },
+                    tickfont: { color: '#64748b', size: 9 },
+                    gridcolor: '#1e2d42',
+                    zerolinecolor: '#1e2d42',
+                    range: [-200, 6800]
+                }
             };
 
-            Plotly.newPlot('scatterPlot', [trace], layout, { displayModeBar: false, responsive: true });
+            const config = { responsive: true, displayModeBar: false };
+            Plotly.newPlot('scatterPlot', data, layout, config);
         }
 
         function renderStackedBar() {
             if (!globalData || !globalData.stations) return;
 
             const stations = globalData.stations;
-            const xNames = stations.map(s => s.station_name);
+            const names = stations.map(s => s.station_name);
             const bikeLanes = stations.map(s => s.bike_lane_km_1000m || 0);
-            const bikeSpots = stations.map(s => (s.shared_bike_spots_1000m !== undefined ? s.shared_bike_spots_1000m : (s.shared_bike_spots || 0)) / 10);
+            const sharedSpots = stations.map(s => s.shared_bike_spots_1000m !== undefined ? s.shared_bike_spots_1000m : (s.shared_bike_spots || 0));
 
             const trace1 = {
-                x: xNames,
+                x: names,
                 y: bikeLanes,
                 name: 'Bike Lanes (km)',
                 type: 'bar',
@@ -683,37 +755,42 @@ HTML_TEMPLATE = """
             };
 
             const trace2 = {
-                x: xNames,
-                y: bikeSpots,
-                name: 'Shared Spots (/10)',
+                x: names,
+                y: sharedSpots,
+                name: 'Shared Bike Spots',
                 type: 'bar',
                 marker: { color: '#f97316' }
             };
 
             const layout = {
                 barmode: 'stack',
-                paper_bgcolor: 'rgba(0,0,0,0)',
-                plot_bgcolor: 'rgba(0,0,0,0)',
-                margin: { l: 30, r: 10, t: 10, b: 50 },
-                xaxis: { tickfont: { color: '#94a3b8', size: 8 }, tickangle: -45, gridcolor: 'transparent' },
-                yaxis: { tickfont: { color: '#94a3b8', size: 9 }, gridcolor: '#1e293b' },
-                legend: { font: { color: '#cbd5e1', size: 9 }, orientation: 'h', y: 1.15, x: 0 },
-                showlegend: true
+                paper_bgcolor: 'transparent',
+                plot_bgcolor: 'transparent',
+                margin: { l: 30, r: 10, t: 10, b: 60 },
+                showlegend: true,
+                legend: {
+                    x: 0, y: 1.1,
+                    orientation: 'h',
+                    font: { color: '#e2e8f0', size: 9 }
+                },
+                xaxis: {
+                    tickfont: { color: '#64748b', size: 8 },
+                    tickangle: -45,
+                    gridcolor: '#1e2d42'
+                },
+                yaxis: {
+                    tickfont: { color: '#64748b', size: 8 },
+                    gridcolor: '#1e2d42'
+                }
             };
 
-            Plotly.newPlot('stackedBar', [trace1, trace2], layout, { displayModeBar: false, responsive: true });
+            const config = { responsive: true, displayModeBar: false };
+            Plotly.newPlot('stackedBar', [trace1, trace2], layout, config);
         }
     </script>
 </body>
 </html>
 """
 
-# ---------------------------------------------------------
-# MAIN EXECUTION ROUTE
-# ---------------------------------------------------------
-@app.route('/')
-def index():
-    return render_template_string(HTML_TEMPLATE)
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True, port=5000)
