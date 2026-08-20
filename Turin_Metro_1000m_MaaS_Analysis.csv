@@ -1,0 +1,24 @@
+﻿gtfs_id,station_name,longitude,latitude,dist_to_ztl_m,ztl_status,is_ztl_influenced,bike_lane_km_1000m,bike_segment_count,shared_bike_spots_1000m,maas_readiness_score,cluster_id,geoai_cluster_name
+56664001,Porta Nuova,7.678958,45.062754,105.8,ZTL Buffer Zone (<500m),1,11.87,100,127,6.1,0,Cluster 1: High-Density MaaS Hubs
+56663001,Re Umberto,7.674145,45.064487,86.7,ZTL Buffer Zone (<500m),1,14.07,120,107,7.1,0,Cluster 1: High-Density MaaS Hubs
+51616007,Bernini,7.655792,45.076026,1251.4,Outside ZTL Zone,0,17.04,97,111,8.4,1,Cluster 2: Moderate Transition Zones
+51329010,Rivoli,7.644222,45.075554,2060.0,Outside ZTL Zone,0,9.17,54,39,5.0,1,Cluster 2: Moderate Transition Zones
+50645012,Paradiso,7.602397,45.073851,5263.1,Outside ZTL Zone,0,0.0,0,7,1.0,2,Cluster 3: Isolated Feeder Stations
+53573001,XVIII Dicembre,7.667985,45.073767,283.8,ZTL Buffer Zone (<500m),1,18.58,149,176,9.1,0,Cluster 1: High-Density MaaS Hubs
+57059001,Porta Susa,7.665298,45.070648,314.6,ZTL Buffer Zone (<500m),1,18.05,146,176,8.8,0,Cluster 1: High-Density MaaS Hubs
+51150010,Monte Grappa,7.636402,45.075239,2641.2,Outside ZTL Zone,0,6.59,47,20,3.9,2,Cluster 3: Isolated Feeder Stations
+50980013,Pozzo Strada,7.62918,45.074942,3189.7,Outside ZTL Zone,0,5.14,23,14,3.2,2,Cluster 3: Isolated Feeder Stations
+50828020,Massaua,7.62014,45.074569,3884.8,Outside ZTL Zone,0,3.93,28,12,2.7,2,Cluster 3: Isolated Feeder Stations
+50740021,Marche,7.6148,45.074354,4298.2,Outside ZTL Zone,0,3.42,22,9,2.5,2,Cluster 3: Isolated Feeder Stations
+56662001,Vinzaglio,7.666357,45.067291,250.2,ZTL Buffer Zone (<500m),1,14.38,106,127,7.2,0,Cluster 1: High-Density MaaS Hubs
+52025005,Dante,7.672883,45.046904,1798.0,Outside ZTL Zone,0,20.77,141,123,10.0,0,Cluster 1: High-Density MaaS Hubs
+51445008,Racconigi,7.649099,45.075751,1710.2,Outside ZTL Zone,0,12.51,73,78,6.4,1,Cluster 2: Moderate Transition Zones
+53752005,Fermi,7.591176,45.075996,6166.5,Outside ZTL Zone,0,0.0,0,6,1.0,2,Cluster 3: Isolated Feeder Stations
+57866002,Spezia,7.669494,45.038134,2787.3,Outside ZTL Zone,0,9.55,53,33,5.1,1,Cluster 2: Moderate Transition Zones
+57871001,Nizza,7.674621,45.051436,1287.6,Outside ZTL Zone,0,9.99,71,104,5.3,1,Cluster 2: Moderate Transition Zones
+57872001,Marconi,7.676852,45.057142,642.7,Outside ZTL Zone,0,10.86,80,110,5.7,1,Cluster 2: Moderate Transition Zones
+51856006,Principi d'Acaja,7.664641,45.076386,622.5,Outside ZTL Zone,0,18.1,134,156,8.8,0,Cluster 1: High-Density MaaS Hubs
+52025005,Carducci-Molinette,7.671155,45.042448,2300.5,Outside ZTL Zone,0,20.77,141,123,10.0,0,Cluster 1: High-Density MaaS Hubs
+57905001,Lingotto,7.666883,45.031404,3547.6,Outside ZTL Zone,0,7.79,33,14,4.4,2,Cluster 3: Isolated Feeder Stations
+,Bengasi,7.661302,45.016967,5180.0,Outside ZTL Zone,0,14.29,99,24,7.2,1,Cluster 2: Moderate Transition Zones
+,Italia '61 - Regione Piemonte,7.66429,45.024678,4307.4,Outside ZTL Zone,0,14.29,99,24,7.2,1,Cluster 2: Moderate Transition Zones
