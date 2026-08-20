@@ -134,7 +134,7 @@ HTML_TEMPLATE = """
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
@@ -633,6 +633,9 @@ HTML_TEMPLATE = """
             renderScatterPlot();
         }
 
+        // ---------------------------------------------------------
+        # REFINED SCATTERPLOT RENDERING (ZTL INTERCEPTION MATRIX)
+        // ---------------------------------------------------------
         function renderScatterPlot() {
             if (!globalData || !globalData.stations) return;
 
@@ -674,7 +677,7 @@ HTML_TEMPLATE = """
                 mode: 'markers',
                 name: traceName,
                 marker: {
-                    size: dataArray.map(d => d.isSelected ? 14 : 9),
+                    size: dataArray.map(d => d.isSelected ? 14 : 11),
                     color: color,
                     symbol: 'circle',
                     opacity: dataArray.map(d => (selectedVal === "ALL" || d.isSelected) ? 1.0 : 0.35),
@@ -687,18 +690,18 @@ HTML_TEMPLATE = """
             });
 
             const traceC1 = createClusterTrace(cluster1, 'Cluster 1: High-Density', '#10b981');
-            const traceC2 = createClusterTrace(cluster2, 'Cluster 2: Moderate', '#c084fc');
+            const traceC2 = createClusterTrace(cluster2, 'Cluster 2: Moderate', '#a855f7');
             const traceC3 = createClusterTrace(cluster3, 'Cluster 3: Isolated', '#f43f5e');
 
             const thresholdLine = {
                 type: 'line',
-                x0: 0,
-                x1: 35,
+                x0: -1,
+                x1: 36,
                 y0: 500,
                 y1: 500,
                 line: {
                     color: '#06b6d4',
-                    width: 2,
+                    width: 2.5,
                     dash: 'dash'
                 }
             };
@@ -708,29 +711,34 @@ HTML_TEMPLATE = """
             const layout = {
                 paper_bgcolor: 'transparent',
                 plot_bgcolor: 'transparent',
-                margin: { l: 45, r: 15, t: 10, b: 45 },
+                margin: { l: 50, r: 15, t: 10, b: 45 },
                 showlegend: true,
                 legend: {
-                    x: 0.15, 
-                    y: 1.05,
-                    orientation: 'v',
-                    font: { color: '#e2e8f0', size: 10, family: 'Inter, sans-serif' },
-                    bgcolor: 'transparent'
+                    x: 0.35, 
+                    y: 0.98,
+                    xanchor: 'left',
+                    yanchor: 'top',
+                    font: { color: '#ffffff', size: 12, family: 'Inter, sans-serif', weight: 600 },
+                    bgcolor: 'transparent',
+                    itemsizing: 'constant',
+                    traceorder: 'normal'
                 },
                 shapes: [thresholdLine],
                 xaxis: {
-                    title: { text: 'Simulated Bike Lane (km)', font: { color: '#94a3b8', size: 10 } },
-                    tickfont: { color: '#64748b', size: 9 },
-                    gridcolor: '#1e2d42',
-                    zerolinecolor: '#1e2d42',
-                    range: [0, 35]
+                    title: { text: 'Simulated Bike Lane (km)', font: { color: '#94a3b8', size: 11, family: 'Inter' }, pad: 8 },
+                    tickfont: { color: '#64748b', size: 10 },
+                    gridcolor: '#1a273a',
+                    zerolinecolor: '#1a273a',
+                    range: [-1, 36],
+                    dtick: 10
                 },
                 yaxis: {
-                    title: { text: 'Distance to ZTL (m)', font: { color: '#94a3b8', size: 10 } },
-                    tickfont: { color: '#64748b', size: 9 },
-                    gridcolor: '#1e2d42',
-                    zerolinecolor: '#1e2d42',
-                    range: [-200, 6800]
+                    title: { text: 'Distance to ZTL (m)', font: { color: '#94a3b8', size: 11, family: 'Inter' }, pad: 8 },
+                    tickfont: { color: '#64748b', size: 10 },
+                    gridcolor: '#1a273a',
+                    zerolinecolor: '#1a273a',
+                    range: [-300, 6800],
+                    dtick: 1000
                 }
             };
 
