@@ -559,105 +559,107 @@ HTML_TEMPLATE = """
         }
 
         function renderScatterPlot() {
-            if (!globalData || !globalData.stations) return;
+    if (!globalData || !globalData.stations) return;
 
-            const selectedVal = document.getElementById('stationSelect').value;
-            const addKm = parseFloat(document.getElementById('bikeSlider').value) || 0;
+    const selectedVal = document.getElementById('stationSelect').value;
+    const addKm = parseFloat(document.getElementById('bikeSlider').value) || 0;
 
-            const cluster1 = [];
-            const cluster2 = [];
-            const cluster3 = [];
+    const cluster1 = [];
+    const cluster2 = [];
+    const cluster3 = [];
 
-            globalData.stations.forEach(st => {
-                const origBike = st.bike_lane_km_1000m || 0;
-                const simBike = origBike + addKm;
-                const distZtl = Math.round(st.dist_to_ztl_m || 0);
+    globalData.stations.forEach(st => {
+        const origBike = st.bike_lane_km_1000m || 0;
+        const simBike = origBike + addKm;
+        const distZtl = Math.round(st.dist_to_ztl_m || 0);
 
-                const item = {
-                    x: simBike,
-                    y: distZtl,
-                    name: st.station_name,
-                    cluster: st.geoai_cluster_name || "Cluster 2: Moderate",
-                    isSelected: (selectedVal !== "ALL" && st.station_name === selectedVal)
-                };
+        const item = {
+            x: simBike,
+            y: distZtl,
+            name: st.station_name,
+            cluster: st.geoai_cluster_name || "Cluster 2: Moderate",
+            isSelected: (selectedVal !== "ALL" && st.station_name === selectedVal)
+        };
 
-                const clusterStr = String(item.cluster).toLowerCase();
+        const clusterStr = String(item.cluster).toLowerCase();
 
-                if (clusterStr.includes("1") || clusterStr.includes("high")) {
-                    cluster1.push(item);
-                } else if (clusterStr.includes("3") || clusterStr.includes("isolated")) {
-                    cluster3.push(item);
-                } else {
-                    cluster2.push(item);
-                }
-            });
-
-            const createClusterTrace = (dataArray, traceName, color) => ({
-                x: dataArray.map(d => d.x),
-                y: dataArray.map(d => d.y),
-                text: dataArray.map(d => d.name),
-                mode: 'markers',
-                name: traceName,
-                marker: {
-                    size: dataArray.map(d => d.isSelected ? 14 : 11),
-                    color: color,
-                    symbol: 'circle',
-                    opacity: dataArray.map(d => (selectedVal === "ALL" || d.isSelected) ? 1.0 : 0.35),
-                    line: {
-                        color: dataArray.map(d => d.isSelected ? '#ffffff' : 'transparent'),
-                        width: dataArray.map(d => d.isSelected ? 2.5 : 0)
-                    }
-                },
-                hovertemplate: '<b>%{text}</b><br>Simulated Bike Lane: %{x:.1f} km<br>Distance to ZTL: %{y} m<extra></extra>'
-            });
-
-            const traceC1 = createClusterTrace(cluster1, 'Cluster 1: High-Density', '#10b981');
-            const traceC2 = createClusterTrace(cluster2, 'Cluster 2: Moderate', '#a855f7');
-            const traceC3 = createClusterTrace(cluster3, 'Cluster 3: Isolated', '#f43f5e');
-
-            const thresholdLine = {
-                type: 'line',
-                x0: -1,
-                x1: 36,
-                y0: 500,
-                y1: 500,
-                line: { color: '#06b6d4', width: 2.5, dash: 'dash' }
-            };
-
-            const layout = {
-                paper_bgcolor: 'transparent',
-                plot_bgcolor: 'transparent',
-                margin: { l: 50, r: 15, t: 10, b: 45 },
-                showlegend: true,
-                legend: {
-                    x: 0.35, y: 0.98,
-                    xanchor: 'left', yanchor: 'top',
-                    font: { color: '#ffffff', size: 12, family: 'Inter', weight: 600 },
-                    bgcolor: 'transparent',
-                    itemsizing: 'constant'
-                },
-                shapes: [thresholdLine],
-                xaxis: {
-                    title: { text: 'Simulated Bike Lane (km)', font: { color: '#94a3b8', size: 11, family: 'Inter' }, pad: 8 },
-                    tickfont: { color: '#64748b', size: 10 },
-                    gridcolor: '#1a273a',
-                    zerolinecolor: '#1a273a',
-                    range: [-1, 36],
-                    dtick: 10
-                },
-                yaxis: {
-                    title: { text: 'Distance to ZTL (m)', font: { color: '#94a3b8', size: 11, family: 'Inter' }, pad: 8 },
-                    tickfont: { color: '#64748b', size: 10 },
-                    gridcolor: '#1a273a',
-                    zerolinecolor: '#1a273a',
-                    range: [-300, 6800],
-                    dtick: 1000
-                }
-            };
-
-            Plotly.newPlot('scatterPlot', [traceC1, traceC2, traceC3], layout, { responsive: true, displayModeBar: false });
+        if (clusterStr.includes("1") || clusterStr.includes("high")) {
+            cluster1.push(item);
+        } else if (clusterStr.includes("3") || clusterStr.includes("isolated")) {
+            cluster3.push(item);
+        } else {
+            cluster2.push(item);
         }
+    });
 
+    const createClusterTrace = (dataArray, traceName, color) => ({
+        x: dataArray.map(d => d.x),
+        y: dataArray.map(d => d.y),
+        text: dataArray.map(d => d.name),
+        mode: 'markers',
+        name: traceName,
+        marker: {
+            size: dataArray.map(d => d.isSelected ? 11 : 8.5),
+            color: color,
+            symbol: 'circle',
+            opacity: dataArray.map(d => (selectedVal === "ALL" || d.isSelected) ? 1.0 : 0.35),
+            line: {
+                color: dataArray.map(d => d.isSelected ? '#ffffff' : 'transparent'),
+                width: dataArray.map(d => d.isSelected ? 2 : 0)
+            }
+        },
+        hovertemplate: '<b>%{text}</b><br>Simulated Bike Lane: %{x:.1f} km<br>Distance to ZTL: %{y} m<extra></extra>'
+    });
+
+    const traceC1 = createClusterTrace(cluster1, 'Cluster 1: High-Density', '#10b981');
+    const traceC2 = createClusterTrace(cluster2, 'Cluster 2: Moderate', '#a855f7');
+    const traceC3 = createClusterTrace(cluster3, 'Cluster 3: Isolated', '#f43f5e');
+
+    const thresholdLine = {
+        type: 'line',
+        x0: -2,
+        x1: 37,
+        y0: 500,
+        y1: 500,
+        line: { color: '#06b6d4', width: 2, dash: 'dash' }
+    };
+
+    const layout = {
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        margin: { l: 45, r: 15, t: 55, b: 40 },
+        showlegend: true,
+        legend: {
+            x: 0.28, 
+            y: 1.22,
+            xanchor: 'left', 
+            yanchor: 'top',
+            font: { color: '#e2e8f0', size: 10.5, family: 'Inter, sans-serif' },
+            bgcolor: 'transparent',
+            itemsizing: 'constant',
+            tracegroupgap: 0
+        },
+        shapes: [thresholdLine],
+        xaxis: {
+            title: { text: 'Simulated Bike Lane (km)', font: { color: '#94a3b8', size: 10, family: 'Inter' }, pad: 6 },
+            tickfont: { color: '#64748b', size: 9 },
+            gridcolor: '#162232',
+            zerolinecolor: '#162232',
+            range: [-1, 35],
+            dtick: 10
+        },
+        yaxis: {
+            title: { text: 'Distance to ZTL (m)', font: { color: '#94a3b8', size: 10, family: 'Inter' }, pad: 6 },
+            tickfont: { color: '#64748b', size: 9 },
+            gridcolor: '#162232',
+            zerolinecolor: '#162232',
+            range: [-300, 6800],
+            dtick: 2000
+        }
+    };
+
+    Plotly.newPlot('scatterPlot', [traceC1, traceC2, traceC3], layout, { responsive: true, displayModeBar: false });
+}
         function renderStackedBar() {
             if (!globalData || !globalData.stations) return;
 
