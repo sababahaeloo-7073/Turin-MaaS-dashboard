@@ -9,10 +9,9 @@ app = Flask(__name__)
 
 METRO_STATION_ORDER = [
     "Fermi", "Paradiso", "Marche", "Massaua", "Pozzo Strada", 
-    "Monte Grappa", "Riva Rocci", "Spezia", "Carducci-Molinette", 
-    "Dante", "Nizza", "Marconi", "Porta Nuova", "Re Umberto", 
-    "Vittorio Emanuele", "XVIII Dicembre", "PrinciPessa Clotilde", 
-    "Bernini", "Racconigi", "Rivarolo", "Bengasi"
+    "Monte Grappa", "Rivoli", "Racconigi", "Bernini", "Principi d'Acaja", "XVIII Dicembre", "Porta Susa", "Vinzaglio", 
+    "Re Umberto", "Porta Nuova", "Marconi", "Nizza", "Dante", "Carducci-Molinette", "Spezia", 
+    "Lingotto", "Italia '61 - Regione Piemonte", "Bengasi"
 ]
 
 def get_turin_boundary():
